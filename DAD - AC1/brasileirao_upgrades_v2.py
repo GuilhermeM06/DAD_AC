@@ -271,11 +271,9 @@ com a pesquisa (e pode ser vazia, se não achar ninguém)
 def busca_imprecisa_por_nome_de_time(dados,nome_time):
     lista_ids_times = []
     for id_time in dados["equipes"]:
-        time=dados["equipes"][id_time]
-        if nome_time in time["nome"] or nome_time in time["nome-comum"] or time["nome-slug"] == nome_time or time["sigla"] == nome_time:
-            lista_ids_times.append(time)
+        if nome_time in dados["equipes"][id_time]["nome"] or nome_time in dados["equipes"][id_time]["nome-comum"] or dados["equipes"][id_time]["nome-slug"] == nome_time or dados["equipes"][id_time]["sigla"] == nome_time:
+            lista_ids_times.append(dados["equipes"][id_time]["id"])
     return lista_ids_times
-
 #ids dos jogos de um time
 
 '''
@@ -290,15 +288,6 @@ def ids_de_jogos_de_um_time(dados,time_id):
             ids_jogos_time.append(i)
     return ids_jogos_time
 
-
-
-
-    
-    
-    
-    
-    
-
 '''
 Usando as ids dos jogos em que um time participou, podemos descobrir
 em que dias ele jogou.
@@ -308,8 +297,14 @@ Note que essa função recebe o nome-comum do time, nao sua id.
 Ela retorna uma lista das datas em que o time jogou
 '''
 def datas_de_jogos_de_um_time(dados,nome_time):
-    pass
-
+    datas_jogos = []
+    lista_equipes = dados["equipes"]
+    for equipe in lista_equipes:
+        if nome_time == lista_equipes[equipe]["nome-comum"]:
+            for jogo in ids_de_jogos_de_um_time(dados, lista_equipes[equipe]["id"]):
+                datas_jogos.append(jogo["data"])
+    return datas_jogos
+            
 
 '''
 A proxima funcao recebe apenas o dicionario dos dados do brasileirao
@@ -357,7 +352,6 @@ Ela retorna a classificacao desse time no campeonato.
 Se a id nao for valida, ela retorna a string 'nao encontrado'
 '''
 def classificacao_do_time_por_id(dados,time_id):
-    pass
 
 
 import unittest
@@ -556,4 +550,4 @@ dados2018 = pega_dados()
 
 if __name__ == '__main__':
     runTests()
-    pprint(busca_imprecisa_por_nome_de_time(dados2018, "fla"))
+    datas_de_jogos_de_um_time(dados2018, "Flamengo")
