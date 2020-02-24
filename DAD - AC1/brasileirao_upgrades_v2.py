@@ -271,11 +271,9 @@ com a pesquisa (e pode ser vazia, se não achar ninguém)
 def busca_imprecisa_por_nome_de_time(dados,nome_time):
     lista_ids_times = []
     for id_time in dados["equipes"]:
-        time=dados["equipes"][id_time]
-        if nome_time in time["nome"] or nome_time in time["nome-comum"] or time["nome-slug"] == nome_time or time["sigla"] == nome_time:
-            lista_ids_times.append(time)
+        if nome_time in dados["equipes"][id_time]["nome"] or nome_time in dados["equipes"][id_time]["nome-comum"] or dados["equipes"][id_time]["nome-slug"] == nome_time or dados["equipes"][id_time]["sigla"] == nome_time:
+            lista_ids_times.append(dados["equipes"][id_time]["id"])
     return lista_ids_times
-
 #ids dos jogos de um time
 
 '''
@@ -290,15 +288,6 @@ def ids_de_jogos_de_um_time(dados,time_id):
             ids_jogos_time.append(i)
     return ids_jogos_time
 
-
-
-
-    
-    
-    
-    
-    
-
 '''
 Usando as ids dos jogos em que um time participou, podemos descobrir
 em que dias ele jogou.
@@ -308,7 +297,15 @@ Note que essa função recebe o nome-comum do time, nao sua id.
 Ela retorna uma lista das datas em que o time jogou
 '''
 def datas_de_jogos_de_um_time(dados,nome_time):
-    pass
+    datas_jogos = []
+    id_times = id_do_time(dados,nome_time)
+    jogos_ids = ids_de_jogos_de_um_time(dados,id_times)
+    datas = dados["fases"]["2700"]["jogos"]["data"]
+    for i in jogos_ids:
+        for d in datas:
+            if i in datas[d]:
+                datas_jogos.append(d)
+    return datas_jogos
 
 
 '''
@@ -321,7 +318,24 @@ e o valor associado ao '17' é o numero de gols total que o palmeiras fez.
 '''
 
 def dicionario_de_gols(dados):
-    pass
+    dic_gols = {}
+    times = dados["equipes"]
+    for t in times:
+        placar = 0
+        id_jogos = ids_de_jogos_de_um_time(dados,t)
+        for i in id_jogos:
+            if dados["fases"]["2700"]["jogos"]["id"][i]["time1"] == t:
+                placar += int(dados["fases"]["2700"]["jogos"]["id"][i]["placar1"])
+            
+            elif dados["fases"]["2700"]["jogos"]["id"][i]["time2"] == t:
+                placar += int(dados["fases"]["2700"]["jogos"]["id"][i]["placar2"])
+        dic_gols[t] = placar
+    return dic_gols
+
+
+
+
+
 
 '''
 A proxima funcao recebe apenas o dicionario dos dados do brasileirao
@@ -329,12 +343,15 @@ A proxima funcao recebe apenas o dicionario dos dados do brasileirao
 Ela devolve a id do time que fez mais gols no campeonato
 '''
 def time_que_fez_mais_gols(dados):
-    pass
-
-
-
-
-
+    gols = []
+    times1 = []
+    gols_times = dicionario_de_gols(dados)
+    for times in gols_times:
+        times1.append(times)
+        gols.append(gols_times[times])
+    maior = max(gols)
+    time_maior_gols = times1[int(gols.index(maior))]
+    return time_maior_gols
 
 '''
 Da mesma forma que podemos obter a informacao dos times classificados
@@ -347,7 +364,17 @@ Consulte a zona de rebaixamento do dicionário de dados, nao deixe
 ela chumbada da função
 '''
 def rebaixados(dados):
-    pass
+    rebaixados_times = []
+    num_rebaixados1 = int(dados["fases"]["2700"]["faixas-classificacao"]["classifica3"]["faixa"].split("-")[0])
+    num_rebaixados2 = int(dados["fases"]["2700"]["faixas-classificacao"]["classifica3"]["faixa"].split("-")[1])
+    times = dados["fases"]["2700"]["classificacao"]["grupo"]["Único"]
+    indices_rebaixados = []
+    for rebaixados in range(len(times)):
+        if rebaixados >= (num_rebaixados1 - 1) and rebaixados <= num_rebaixados2:
+            indices_rebaixados.append(rebaixados)
+    for i in indices_rebaixados:
+        rebaixados_times.append(times[i])
+    return rebaixados_times
 
 '''
 A proxima função recebe (alem do dicionario de dados do brasileirao) uma id de time
@@ -358,7 +385,6 @@ Se a id nao for valida, ela retorna a string 'nao encontrado'
 '''
 def classificacao_do_time_por_id(dados,time_id):
     pass
-
 
 import unittest
 try:
@@ -556,4 +582,4 @@ dados2018 = pega_dados()
 
 if __name__ == '__main__':
     runTests()
-    pprint(busca_imprecisa_por_nome_de_time(dados2018, "fla"))
+    print(rebaixados(dados2018))
