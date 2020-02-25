@@ -36,7 +36,7 @@ python com o que aparece no firefox
 '''
 dados2018 = pega_dados()
 
-#print('todas as chaves do dicionario principal', dados2018.keys())
+print('todas as chaves do dicionario principal', dados2018.keys())
 
 #print('dados do time corinthians')
 #pprint(dados2018['equipes']['6'])
@@ -48,7 +48,7 @@ dados2018 = pega_dados()
 #print('faixas de classificacao e rebaixamento')
 #pprint(dados2018['fases']['2700']['faixas-classificacao'])
 
-print('classificacao dos times no fim do campeonato')
+# print('classificacao dos times no fim do campeonato')
 #print(dados2018['fases']['2700']['classificacao']['grupo']['Único'])
 #print(dados2018['fases']['2700']['classificacao'])
 
@@ -384,7 +384,14 @@ Ela retorna a classificacao desse time no campeonato.
 Se a id nao for valida, ela retorna a string 'nao encontrado'
 '''
 def classificacao_do_time_por_id(dados,time_id):
-    pass
+    # if dados in ()
+    # self.assertEqual(classificacao_do_time_por_id(dados,'17'),1)
+    times = dados["fases"]["2700"]["classificacao"]["grupo"]["Único"]
+    if time_id in times:
+        posicao = times.index(time_id) + 1
+        return posicao
+    else:
+        return 'nao encontrado'
 
 import unittest
 try:
